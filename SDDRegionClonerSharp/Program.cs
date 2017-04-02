@@ -75,41 +75,47 @@ namespace SDDRegionClonerSharp
             }
 
 
-        static void updatePhones(ref string htmltext, Connection connection, int startIndex = 0)
+        static void updatePhones(ref string htmltext, Connection connection)
             {
+            int startIndex = 0;
             int lineStartIndex = htmltext.IndexOf("<a class=\"phone_link\"", startIndex);
-            if (lineStartIndex == -1) { return; };
-            int lineEndIndex = lineStartIndex + htmltext.Substring(lineStartIndex).IndexOf("</a>");
-            string updatedPhoneBlock = "";
-            if (startIndex == 0)
+            while (lineStartIndex != -1)
+            {
+                int lineEndIndex = lineStartIndex + htmltext.Substring(lineStartIndex).IndexOf("</a>");
+                string updatedPhoneBlock = "";
+                if (startIndex == 0)
                 {
-                foreach (Phone phone in connection.phones)
+                    foreach (Phone phone in connection.phones)
                     {
-                    updatedPhoneBlock += "<a class=\"phone_link\" href=\"tel:+" + phone.phone.Replace("+", "").Replace(" ", "").Replace("(", "").Replace(")", "").Replace("-", "") + "\" rel=\"nofollow\">" + phone.phone + " <b>" + phone.name + "</b></a>";
+                        updatedPhoneBlock += "<a class=\"phone_link\" href=\"tel:+" + phone.phone.Replace("+", "").Replace(" ", "").Replace("(", "").Replace(")", "").Replace("-", "") + "\" rel=\"nofollow\">" + phone.phone + " <b>" + phone.name + "</b></a>";
                     }
                 }
-            else
+                else
                 {
-                foreach (Phone phone in connection.phones)
+                    foreach (Phone phone in connection.phones)
                     {
-                    updatedPhoneBlock += "<a class=\"phone_link\" href=\"tel:+" + phone.phone.Replace("+", "").Replace(" ", "").Replace("(", "").Replace(")", "").Replace("-", "") + "\" rel=\"nofollow\">" + phone.phone  + "</a>";
+                        updatedPhoneBlock += "<a class=\"phone_link\" href=\"tel:+" + phone.phone.Replace("+", "").Replace(" ", "").Replace("(", "").Replace(")", "").Replace("-", "") + "\" rel=\"nofollow\">" + phone.phone + "</a>";
                     }
                 }
-            
-
-            htmltext = htmltext.Remove(lineStartIndex, lineEndIndex-lineStartIndex + 4).Insert(lineStartIndex, updatedPhoneBlock);
-            updatePhones(ref htmltext, connection, lineStartIndex+updatedPhoneBlock.Length);
-
+                htmltext = htmltext.Remove(lineStartIndex, lineEndIndex - lineStartIndex + 4).Insert(lineStartIndex, updatedPhoneBlock);
+                startIndex = lineStartIndex + updatedPhoneBlock.Length;
+                lineStartIndex = htmltext.IndexOf("<a class=\"phone_link\"", startIndex);
+            }
             }
 
-        static void updateMails(ref string htmltext, Connection connection, int startIndex = 0)
+        static void updateMails(ref string htmltext, Connection connection)
         {
+            int startIndex = 0;
             int lineStartIndex = htmltext.IndexOf("<a class=\"mail_link\"", startIndex);
-            if (lineStartIndex == -1) { return; };
-            int lineEndIndex = lineStartIndex + htmltext.Substring(lineStartIndex).IndexOf("</a>");
-            string updatedMail = "<a class=\"mail_link\" href=\"mailto:"+ connection.email.ToString() + "\">"+ connection.email.ToString()  + "</a>";
-            htmltext = htmltext.Remove(lineStartIndex, lineEndIndex - lineStartIndex + 4).Insert(lineStartIndex, updatedMail);
-            updateMails(ref htmltext, connection, lineStartIndex + updatedMail.Length);
+            while (lineStartIndex != -1)
+            {            
+                int lineEndIndex = lineStartIndex + htmltext.Substring(lineStartIndex).IndexOf("</a>");
+                string updatedMail = "<a class=\"mail_link\" href=\"mailto:" + connection.email.ToString() + "\">" + connection.email.ToString() + "</a>";
+                htmltext = htmltext.Remove(lineStartIndex, lineEndIndex - lineStartIndex + 4).Insert(lineStartIndex, updatedMail);
+                startIndex = lineStartIndex + updatedMail.Length;
+                lineStartIndex = htmltext.IndexOf("<a class=\"mail_link\"", startIndex);
+            }
+
         }
 
         static void updateGmap(ref string htmltext, Connection connection)
